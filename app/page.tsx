@@ -383,16 +383,7 @@ export default function Home() {
               combines editorial precision with cinematic atmosphere to craft
               experiences that resonate.
             </p>
-            <GlowCard className="p-8">
-              <h3 className="mb-4 text-xl font-medium text-white">
-                Creative Vision
-              </h3>
-              <p className="leading-relaxed text-white/50">
-                Thoughtful restraint, intentional detail, and refined atmosphere
-                are the foundations of every concept. The goal is always clarity
-                with a sense of wonder.
-              </p>
-            </GlowCard>
+
           </div>
 
           <div className="space-y-6">
