@@ -592,7 +592,7 @@ export default function Home() {
             <p className="mb-6 text-xs uppercase tracking-[0.3em] text-white/40">
               Visual Designer
             </p>
-            <h1 className="mb-6 text-5xl font-light leading-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mb-6 text-5xl font-light leading-tight text-white sm:text-6xl lg:text-7xl font-[family-name:var(--font-lodestone)]">
               Cao Nhat Nguyen
             </h1>
             <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-white/50">
