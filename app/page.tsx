@@ -1,426 +1,862 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 
+// 4 project categories with sub-projects
 const projects = [
   {
-    id: 'noir-poster',
-    title: 'Noir Poster Series',
-    category: 'Poster Design',
-    year: '2025',
-    description:
-      'A cinematic poster collection with strong contrast, elegant typography, and a luxury editorial feel for premium cultural events.',
+    id: 'poster',
+    title: 'Poster',
+    category: 'Print Design',
     thumb:
-      'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&q=80&fit=crop&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&q=80&fit=crop&w=1400',
-      'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&q=80&fit=crop&w=1400'
+      'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&q=80&fit=crop&w=1200',
+    subProjects: [
+      {
+        id: 'poster-1',
+        title: 'Event Poster',
+        description: 'Music festival promotional design',
+        image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'poster-2',
+        title: 'Exhibition Poster',
+        description: 'Art gallery opening announcement',
+        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'poster-3',
+        title: 'Film Poster',
+        description: 'Independent film promotional artwork',
+        image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&q=80&fit=crop&w=800',
+      },
     ],
-    tags: ['Editorial', 'Print', 'Luxury']
   },
   {
-    id: 'lumina-ui',
-    title: 'Lumina UI Exploration',
-    category: 'UI/UX',
-    year: '2024',
-    description:
-      'A refined digital product interface built for premium lifestyle brands, blending clean structure with soft motion and modern navigation.',
+    id: 'banner',
+    title: 'Banner',
+    category: 'Digital Design',
     thumb:
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&q=80&fit=crop&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&q=80&fit=crop&w=1400',
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&q=80&fit=crop&w=1400'
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&q=80&fit=crop&w=1200',
+    subProjects: [
+      {
+        id: 'banner-1',
+        title: 'Social Media Banner',
+        description: 'Brand awareness campaign',
+        image: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'banner-2',
+        title: 'Web Banner',
+        description: 'E-commerce promotional design',
+        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'banner-3',
+        title: 'Event Banner',
+        description: 'Conference digital signage',
+        image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&q=80&fit=crop&w=800',
+      },
     ],
-    tags: ['Digital', 'Interface', 'Motion']
   },
   {
-    id: 'editorial-echo',
-    title: 'Editorial Echo',
+    id: 'photobook',
+    title: 'Photobook',
     category: 'Editorial',
-    year: '2024',
-    description:
-      'A story-driven editorial layout with poetic spacing, curated color, and immersive typography for cultural publication campaigns.',
     thumb:
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&q=80&fit=crop&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&q=80&fit=crop&w=1400',
-      'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&q=80&fit=crop&w=1400'
+      'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&q=80&fit=crop&w=1200',
+    subProjects: [
+      {
+        id: 'photobook-1',
+        title: 'Travel Photobook',
+        description: 'Visual journey through landscapes',
+        image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'photobook-2',
+        title: 'Portrait Collection',
+        description: 'Studio portrait compilation',
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'photobook-3',
+        title: 'Wedding Album',
+        description: 'Elegant ceremony documentation',
+        image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&q=80&fit=crop&w=800',
+      },
     ],
-    tags: ['Print', 'Editorial', 'Concept']
   },
   {
-    id: 'serif-brand',
-    title: 'Serif Brand Identity',
-    category: 'Branding',
-    year: '2025',
-    description:
-      'A minimal brand identity system for a boutique studio, focused on tactile materials, memorable typography, and a heritage aesthetic.',
+    id: 'webdesign',
+    title: 'Web Design',
+    category: 'Digital',
     thumb:
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&q=80&fit=crop&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&q=80&fit=crop&w=1400',
-      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&q=80&fit=crop&w=1400'
+      'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&q=80&fit=crop&w=1200',
+    subProjects: [
+      {
+        id: 'web-1',
+        title: 'Portfolio Website',
+        description: 'Creative agency showcase',
+        image: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'web-2',
+        title: 'E-commerce Design',
+        description: 'Fashion brand online store',
+        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&q=80&fit=crop&w=800',
+      },
+      {
+        id: 'web-3',
+        title: 'Landing Page',
+        description: 'SaaS product launch page',
+        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&q=80&fit=crop&w=800',
+      },
     ],
-    tags: ['Brand', 'Identity', 'Luxury']
   },
-  {
-    id: 'pages-photobook',
-    title: 'Pages Photobook',
-    category: 'Photobook',
-    year: '2024',
-    description:
-      'A refined photobook concept combining dark editorial visuals, soft gradients, and thoughtful pacing for creative storytelling.',
-    thumb:
-      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&q=80&fit=crop&w=1200',
-    images: [
-      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&q=80&fit=crop&w=1400',
-      'https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&q=80&fit=crop&w=1400'
-    ],
-    tags: ['Book', 'Photography', 'Story']
-  }
 ];
 
 const navItems = [
   { id: 'home', label: 'Home' },
   { id: 'works', label: 'Works' },
   { id: 'about', label: 'About' },
-  { id: 'contact', label: 'Contact' }
+  { id: 'contact', label: 'Contact' },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 }
-};
+// Animated falling stars background
+function FallingStars() {
+  const stars = useMemo(() => {
+    return Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 20,
+      duration: 15 + Math.random() * 25,
+      size: 1 + Math.random() * 2,
+      opacity: 0.2 + Math.random() * 0.5,
+    }));
+  }, []);
 
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${star.left}%`,
+            width: star.size,
+            height: star.size,
+            opacity: star.opacity,
+            boxShadow: `0 0 ${star.size * 2}px ${star.size}px rgba(255,255,255,${star.opacity * 0.5})`,
+          }}
+          initial={{ top: '-2%', opacity: 0 }}
+          animate={{
+            top: '102%',
+            opacity: [0, star.opacity, star.opacity, 0],
+          }}
+          transition={{
+            duration: star.duration,
+            delay: star.delay,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Rotating background light component
+function RotatingLight() {
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden">
+      <motion.div
+        className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+      >
+        <div className="absolute left-1/2 top-0 h-1/2 w-px origin-bottom -translate-x-1/2">
+          <div className="h-full w-full bg-gradient-to-t from-transparent via-white/[0.03] to-transparent blur-xl" />
+        </div>
+        <div className="absolute left-1/2 top-0 h-1/2 w-32 origin-bottom -translate-x-1/2 rotate-180">
+          <div className="h-full w-full bg-gradient-to-b from-slate-400/[0.04] to-transparent blur-3xl" />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// Profile image component with hover effect
+function ProfileImage() {
+  const [isHovering, setIsHovering] = useState(false);
+
+  return (
+    <motion.div
+      className="relative mx-auto mb-8 h-32 w-32 sm:h-40 sm:w-40"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+    >
+      {/* Outer glow ring */}
+      <motion.div
+        className="absolute -inset-2 rounded-full bg-gradient-to-r from-white/10 via-white/5 to-white/10"
+        animate={{
+          rotate: isHovering ? 360 : 0,
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+      />
+      
+      {/* Image container */}
+      <motion.div
+        className="relative h-full w-full overflow-hidden rounded-full border-2 border-white/10 bg-slate-800"
+        animate={{
+          y: isHovering ? -4 : 0,
+          scale: isHovering ? 1.05 : 1,
+        }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      >
+        <Image
+          src="/images/avatar.jpg"
+          alt="Cao Nhat Nguyen"
+          fill
+          className="object-cover transition-transform duration-500"
+          style={{ transform: isHovering ? 'scale(1.1)' : 'scale(1)' }}
+          sizes="(max-width: 640px) 128px, 160px"
+          priority
+        />
+        
+        {/* Hover overlay */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"
+          animate={{ opacity: isHovering ? 0 : 0.3 }}
+          transition={{ duration: 0.3 }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Mouse-follow glow card component
+function GlowCard({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      whileHover={{ y: -6, scale: 1.01 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className={`group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-slate-900/40 backdrop-blur-sm transition-colors duration-300 hover:border-white/[0.12] ${className}`}
+    >
+      {/* Mouse-follow glow effect */}
+      <div
+        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: isHovering
+            ? `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.06), transparent 40%)`
+            : 'none',
+        }}
+      />
+      {/* Border glow */}
+      <div
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: isHovering
+            ? `radial-gradient(300px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.1), transparent 40%)`
+            : 'none',
+          mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          maskComposite: 'xor',
+          WebkitMaskComposite: 'xor',
+          padding: '1px',
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </motion.div>
+  );
+}
+
+// Project card with hover zoom and mouse-follow lighting
+function ProjectCard({
+  project,
+  onClick,
+}: {
+  project: (typeof projects)[number];
+  onClick: () => void;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/[0.06] bg-slate-900/30 transition-colors duration-300 hover:border-white/[0.15]"
+    >
+      {/* Mouse-follow lighting overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: isHovering
+            ? `radial-gradient(500px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.08), transparent 40%)`
+            : 'none',
+        }}
+      />
+
+      {/* Image with zoom effect */}
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <Image
+          src={project.thumb}
+          alt={project.title}
+          fill
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+      </div>
+
+      {/* Minimal text overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-6">
+        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+          {project.category}
+        </p>
+        <h3 className="text-2xl font-medium text-white">{project.title}</h3>
+        <p className="mt-2 text-sm text-white/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          Click to view projects
+        </p>
+      </div>
+
+      {/* Border glow on hover */}
+      <div
+        className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: isHovering
+            ? `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.12), transparent 40%)`
+            : 'none',
+          mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          maskComposite: 'xor',
+          WebkitMaskComposite: 'xor',
+          padding: '1px',
+        }}
+      />
+    </motion.div>
+  );
+}
+
+// Project modal component
 function ProjectModal({
   project,
-  onClose
+  onClose,
 }: {
   project: (typeof projects)[number] | null;
   onClose: () => void;
 }) {
+  useEffect(() => {
+    if (project) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [project]);
+
+  if (!project) return null;
+
   return (
-    <AnimatePresence>
-      {project ? (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 px-4 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-slate-900/95 p-6 sm:p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full border border-white/10 p-2 text-white/60 transition hover:border-white/20 hover:text-white"
         >
-          <motion.div
-            className="relative w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/95 shadow-luxe"
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 40, opacity: 0 }}
-          >
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute right-5 top-5 z-20 rounded-full border border-white/10 bg-slate-900/95 px-4 py-2 text-sm text-slate-100 transition hover:bg-white/5"
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Modal header */}
+        <div className="mb-8">
+          <p className="mb-2 text-xs uppercase tracking-[0.3em] text-white/40">
+            {project.category}
+          </p>
+          <h2 className="text-3xl font-light text-white sm:text-4xl">
+            {project.title}
+          </h2>
+        </div>
+
+        {/* Sub-projects grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {project.subProjects.map((subProject, index) => (
+            <motion.div
+              key={subProject.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="group overflow-hidden rounded-xl border border-white/[0.06] bg-slate-800/50 transition-colors duration-300 hover:border-white/[0.15]"
             >
-              Đóng
-            </button>
-            <div className="grid gap-8 p-8 md:grid-cols-[1.2fr_0.8fr]">
-              <div className="space-y-6">
-                <div className="relative aspect-[16/10] overflow-hidden rounded-[28px] bg-slate-800">
-                  <Image
-                    src={project.images[0]}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition duration-700 ease-out hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 55vw"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.32em] text-slate-400">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+              {/* Sub-project image - Replace with your own images */}
+              <div className="relative aspect-[4/3] overflow-hidden">
+                <Image
+                  src={subProject.image}
+                  alt={subProject.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
               </div>
-              <div className="space-y-5 text-slate-100">
-                <div className="rounded-[24px] border border-white/10 bg-slate-900/90 p-6 shadow-glow">
-                  <span className="text-sm uppercase tracking-[0.28em] text-sky-300/80">{project.category}</span>
-                  <h2 className="mt-4 text-3xl font-semibold leading-tight text-white">{project.title}</h2>
-                  <p className="mt-4 text-slate-300 leading-8">{project.description}</p>
-                  <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-white/5 px-4 py-3 text-sm text-slate-300">
-                    <span className="text-sky-300">Year</span>
-                    <span>{project.year}</span>
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {project.images.slice(1).map((image, index) => (
-                    <div key={image} className="relative aspect-[4/3] overflow-hidden rounded-[24px] bg-slate-900">
-                      <Image src={image} alt={`${project.title} gallery ${index + 1}`} fill className="object-cover transition duration-700 ease-out hover:scale-105" sizes="(max-width: 768px) 100vw, 25vw" />
-                    </div>
-                  ))}
-                </div>
+              
+              {/* Sub-project info */}
+              <div className="p-4">
+                <h4 className="mb-1 font-medium text-white">
+                  {subProject.title}
+                </h4>
+                <p className="text-sm text-white/50">
+                  {subProject.description}
+                </p>
               </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Add more projects hint */}
+        <p className="mt-8 text-center text-sm text-white/30">
+          Replace placeholder images with your own work in the code
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// Section reveal animation wrapper
+function RevealSection({
+  children,
+  className = '',
+  id,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <motion.section
+      id={id}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      className={className}
+    >
+      {children}
+    </motion.section>
   );
 }
 
 export default function Home() {
+  const [scrolled, setScrolled] = useState(false);
   const [selectedProject, setSelectedProject] = useState<(typeof projects)[number] | null>(null);
-  const featured = useMemo(() => projects.slice(0, 3), []);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <main className="relative overflow-hidden bg-night text-white">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-sky-400/10 via-transparent"></div>
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-night/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5 md:px-8">
-          <a href="#home" className="text-lg font-semibold tracking-[0.23em] text-slate-100">
+    <main className="relative min-h-screen overflow-hidden bg-[#060a12] text-white">
+      {/* Animated falling stars */}
+      <FallingStars />
+
+      {/* Animated rotating background light */}
+      <RotatingLight />
+
+      {/* Subtle static ambient */}
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.02),transparent_50%)]" />
+
+      {/* Header */}
+      <header
+        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'border-b border-white/[0.06] bg-[#060a12]/80 backdrop-blur-xl'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+          <a
+            href="#home"
+            className="text-sm font-medium tracking-[0.2em] text-white/90 transition hover:text-white"
+          >
             CAO NHAT NGUYEN
           </a>
-          <nav className="hidden items-center gap-6 text-sm uppercase tracking-[0.28em] text-slate-300 md:flex">
+          <nav className="hidden items-center gap-8 md:flex">
             {navItems.map((item) => (
-              <a key={item.id} href={`#${item.id}`} className="transition hover:text-slate-100">
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="text-sm tracking-[0.15em] text-white/50 transition hover:text-white"
+              >
                 {item.label}
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-3 md:hidden">
-            <a href="#contact" className="rounded-full border border-slate-700 bg-white/5 px-4 py-2 text-sm text-slate-100 transition hover:border-sky-300/40 hover:text-sky-200">
-              Contact
-            </a>
-          </div>
+          <a
+            href="#contact"
+            className="rounded-full border border-white/10 px-5 py-2 text-sm text-white/70 transition hover:border-white/20 hover:text-white md:hidden"
+          >
+            Contact
+          </a>
         </div>
       </header>
 
-      <section id="home" className="relative mx-auto max-w-7xl px-6 py-16 md:px-8 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.9 }} className="space-y-8">
-            <div className="inline-flex items-center gap-3 rounded-full border border-slate-600/70 bg-slate-900/80 px-4 py-2 text-xs uppercase tracking-[0.28em] text-sky-200/90 shadow-glow">
-              Visual design auteur
-            </div>
-            <div className="space-y-5">
-              <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Portfolio</p>
-              <h1 className="max-w-3xl text-5xl font-semibold leading-tight text-white sm:text-6xl">
-                Cao Nhat Nguyen
-                <span className="block text-4xl text-slate-300 sm:text-5xl">Graphic Designer</span>
-              </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-300">
-                I craft luxury visual experiences with cinematic layouts, editorial storytelling and refined brand systems for creative studios and cultural projects.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <a href="#works" className="inline-flex items-center justify-center rounded-full bg-sky-400 px-7 py-3 text-sm font-semibold uppercase tracking-[0.26em] text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-300">
-                Explore Works
+      {/* Hero Section with parallax */}
+      <section
+        id="home"
+        ref={heroRef}
+        className="relative flex min-h-screen items-center justify-center px-6"
+      >
+        <motion.div
+          style={{ y: heroY, opacity: heroOpacity }}
+          className="relative z-10 mx-auto max-w-4xl text-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Profile Image */}
+            <ProfileImage />
+
+            <p className="mb-6 text-xs uppercase tracking-[0.3em] text-white/40">
+              Visual Designer
+            </p>
+            <h1 className="mb-6 text-5xl font-light leading-tight text-white sm:text-6xl lg:text-7xl font-[family-name:var(--font-lodestone)]">
+              Cao Nhat Nguyen
+            </h1>
+            <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-white/50">
+              Crafting refined visual experiences through thoughtful design,
+              editorial precision, and cinematic storytelling.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="#works"
+                className="group relative overflow-hidden rounded-full bg-white px-8 py-3 text-sm font-medium tracking-[0.15em] text-slate-900 transition hover:bg-white/90"
+              >
+                View Works
               </a>
-              <a href="#contact" className="inline-flex items-center justify-center rounded-full border border-slate-700 px-7 py-3 text-sm uppercase tracking-[0.26em] text-slate-300 transition hover:border-sky-300 hover:text-slate-100">
-                Let’s Connect
+              <a
+                href="#contact"
+                className="rounded-full border border-white/15 px-8 py-3 text-sm tracking-[0.15em] text-white/70 transition hover:border-white/30 hover:text-white"
+              >
+                Get in Touch
               </a>
             </div>
           </motion.div>
+        </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }} className="relative overflow-hidden rounded-[36px] border border-white/10 bg-slate-950/80 p-5 shadow-luxe md:p-8">
-            <div className="absolute -left-16 top-8 h-44 w-44 rounded-full bg-sky-400/10 blur-3xl"></div>
-            <div className="absolute -right-16 bottom-10 h-44 w-44 rounded-full bg-slate-200/10 blur-3xl"></div>
-            <div className="relative h-[520px] overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),transparent_38%)]" />
-              <div className="relative h-full w-full">
-                <div className="absolute left-8 top-8 rounded-full border border-white/5 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.28em] text-slate-200">
-                  Featured Studio
-                </div>
-                <div className="absolute bottom-10 left-8 right-8 grid gap-5 md:grid-cols-2">
-                  <div className="rounded-[28px] border border-white/10 bg-slate-900/90 p-5 text-slate-100 shadow-glow backdrop-blur-xl">
-                    <h2 className="text-xl font-semibold">Cinematic branding</h2>
-                    <p className="mt-3 text-slate-400 leading-7">
-                      Premium visual systems built with motion-led direction and elegant editorial composition.
-                    </p>
-                  </div>
-                  <div className="rounded-[28px] border border-white/10 bg-slate-900/90 p-5 text-slate-100 shadow-glow backdrop-blur-xl">
-                    <h2 className="text-xl font-semibold">Immersive storytelling</h2>
-                    <p className="mt-3 text-slate-400 leading-7">
-                      A refined vocabulary for projects, campaigns, and digital experiences across multiple media.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="h-10 w-6 rounded-full border border-white/20 p-1"
+          >
+            <div className="h-2 w-full rounded-full bg-white/30" />
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      <section id="works" className="mx-auto max-w-7xl px-6 pb-16 md:px-8 lg:pb-24">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.8 }} className="mb-10">
-          <p className="text-sm uppercase tracking-[0.28em] text-sky-200/80">Works</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Selected projects</h2>
-        </motion.div>
-
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {featured.map((project) => (
-            <motion.button
-              key={project.id}
-              type="button"
-              onClick={() => setSelectedProject(project)}
-              whileHover={{ y: -4 }}
-              className="group overflow-hidden rounded-[32px] border border-white/10 bg-slate-950/95 p-0 text-left shadow-luxe transition duration-500 hover:border-sky-300/20"
-            >
-              <div className="relative h-72 overflow-hidden bg-slate-900">
-                <Image
-                  src={project.thumb}
-                  alt={project.title}
-                  fill
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
-              </div>
-              <div className="space-y-3 p-6">
-                <p className="text-xs uppercase tracking-[0.28em] text-sky-300/90">{project.category} • {project.year}</p>
-                <h3 className="text-2xl font-semibold text-white">{project.title}</h3>
-                <p className="text-sm leading-7 text-slate-300">{project.description}</p>
-              </div>
-            </motion.button>
-          ))}
+      {/* Works Section */}
+      <RevealSection
+        id="works"
+        className="relative mx-auto max-w-6xl px-6 py-24"
+      >
+        <div className="mb-16 text-center">
+          <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/40">
+            Portfolio
+          </p>
+          <h2 className="text-4xl font-light text-white sm:text-5xl">
+            Selected Works
+          </h2>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-16 md:px-8 lg:pb-24">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0 } }} transition={{ duration: 0.8 }} className="mb-10">
-          <p className="text-sm uppercase tracking-[0.28em] text-sky-200/80">Portfolio</p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Full work catalog</h2>
-        </motion.div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {projects.map((project) => (
-            <motion.article
+          {projects.map((project, index) => (
+            <motion.div
               key={project.id}
-              whileHover={{ y: -6 }}
-              className="group overflow-hidden rounded-[32px] border border-white/10 bg-slate-950/90 shadow-luxe transition"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <button type="button" onClick={() => setSelectedProject(project)} className="w-full text-left">
-                <div className="relative h-72 overflow-hidden bg-slate-900">
-                  <Image
-                    src={project.thumb}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition duration-700 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 45vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent" />
-                </div>
-                <div className="space-y-4 p-6">
-                  <div className="flex items-center justify-between text-xs uppercase tracking-[0.28em] text-slate-400">
-                    <span>{project.category}</span>
-                    <span>{project.year}</span>
-                  </div>
-                  <h3 className="text-2xl font-semibold text-white">{project.title}</h3>
-                  <p className="text-sm leading-7 text-slate-300">{project.description}</p>
-                </div>
-              </button>
-            </motion.article>
+              <ProjectCard
+                project={project}
+                onClick={() => setSelectedProject(project)}
+              />
+            </motion.div>
           ))}
         </div>
-      </section>
+      </RevealSection>
 
-      <section id="about" className="mx-auto max-w-7xl px-6 pb-16 md:px-8 lg:pb-24">
-        <div className="grid gap-12 lg:grid-cols-[0.95fr_0.8fr]">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.8 }} className="space-y-6">
-            <p className="text-sm uppercase tracking-[0.28em] text-sky-200/80">About</p>
-            <h2 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">A refined practice for bold visual narratives</h2>
-            <p className="max-w-3xl text-lg leading-8 text-slate-300">
-              Cao Nhat Nguyen brings cinematic precision and editorial discipline to every brief. From branding systems to immersive interfaces, the work balances premium minimalism with emotional momentum.
+      {/* Project Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* About Section */}
+      <RevealSection
+        id="about"
+        className="relative mx-auto max-w-6xl px-6 py-24"
+      >
+        <div className="grid gap-16 lg:grid-cols-2 lg:items-start">
+          <div>
+            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/40">
+              About
             </p>
-            <div className="space-y-4 rounded-[32px] border border-white/10 bg-slate-950/90 p-8 shadow-luxe">
-              <div>
-                <h3 className="text-xl font-semibold text-white">Design philosophy</h3>
-                <p className="mt-3 text-slate-300 leading-8">
-                  Thoughtful restraint, intentional detail, and luxurious atmosphere are the foundations of every concept. The goal is always clarity with a sense of wonder.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl bg-slate-900/90 p-5 text-slate-200">
-                  <p className="text-sm uppercase tracking-[0.28em] text-sky-300/80">Experience</p>
-                  <p className="mt-3 leading-7 text-slate-300">Collaborating with premium studios, cultural agencies, and luxury brands to create polished visual stories and high-end digital experiences.</p>
-                </div>
-                <div className="rounded-3xl bg-slate-900/90 p-5 text-slate-200">
-                  <p className="text-sm uppercase tracking-[0.28em] text-sky-300/80">Creative mindset</p>
-                  <p className="mt-3 leading-7 text-slate-300">I approach every project as an editorial narrative, shaping each frame with hierarchy, contrast, and a calm sense of composition.</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            <h2 className="mb-8 text-4xl font-light text-white sm:text-5xl">
+              Design Philosophy
+            </h2>
+            <p className="mb-8 text-lg leading-relaxed text-white/50">
+              I believe in the power of restraint and intentionality. Every
+              element serves a purpose, every space creates meaning. My approach
+              combines editorial precision with cinematic atmosphere to craft
+              experiences that resonate.
+            </p>
+          </div>
 
-          <motion.div initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.8 }} className="space-y-6">
-            <div className="rounded-[32px] border border-white/10 bg-slate-950/90 p-8 shadow-luxe">
-              <h3 className="text-xl font-semibold text-white">Tools & Skills</h3>
-              <p className="mt-4 text-slate-400 leading-7">A premium toolkit for design execution, motion, and creative direction.</p>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {['Figma', 'Adobe Photoshop', 'Adobe Illustrator', 'Lightroom', 'DaVinci Resolve'].map((tool) => (
-                  <div key={tool} className="rounded-3xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-medium text-slate-100 shadow-glow">
+          <div className="space-y-6">
+            <GlowCard className="p-8">
+              <h3 className="mb-6 text-xl font-medium text-white">
+                Tools & Skills
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  'Figma',
+                  'Photoshop',
+                  'Illustrator',
+                  'Lightroom',
+                  'After Effects',
+                  'DaVinci Resolve',
+                ].map((tool) => (
+                  <div
+                    key={tool}
+                    className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-sm text-white/70 transition hover:border-white/[0.12] hover:text-white"
+                  >
                     {tool}
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="rounded-[32px] border border-white/10 bg-slate-950/90 p-8 shadow-luxe">
-              <h3 className="text-xl font-semibold text-white">Creative direction</h3>
-              <p className="mt-4 text-slate-400 leading-7">
-                I develop concepts rooted in visual tension and tactile storytelling, using space and contrast to elevate ideas beyond the ordinary.
+            </GlowCard>
+
+            <GlowCard className="p-8">
+              <h3 className="mb-4 text-xl font-medium text-white">
+                Experience
+              </h3>
+              <p className="leading-relaxed text-white/50">
+                Collaborating with premium studios, cultural agencies, and
+                luxury brands to create polished visual stories and high-end
+                digital experiences.
               </p>
-            </div>
-          </motion.div>
+            </GlowCard>
+          </div>
         </div>
-      </section>
+      </RevealSection>
 
-      <section id="contact" className="mx-auto max-w-7xl px-6 pb-20 md:px-8 lg:pb-28">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_0.7fr]">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fadeUp} transition={{ duration: 0.8 }} className="space-y-6">
-            <p className="text-sm uppercase tracking-[0.28em] text-sky-200/80">Contact</p>
-            <h2 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Let’s create something timeless.</h2>
-            <p className="max-w-2xl text-lg leading-8 text-slate-300">
-              Available for select collaborations, art direction, and identity systems. Reach out to discuss new work, commissions, or creative partnerships.
+      {/* Contact Section */}
+      <RevealSection
+        id="contact"
+        className="relative mx-auto max-w-6xl px-6 py-24"
+      >
+        <div className="grid gap-16 lg:grid-cols-2">
+          <div>
+            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/40">
+              Contact
             </p>
-            <div className="rounded-[32px] border border-white/10 bg-slate-950/90 p-8 shadow-luxe">
-              <p className="text-sm uppercase tracking-[0.28em] text-sky-300/90">Say hello</p>
-              <div className="mt-6 space-y-3 text-slate-300">
-                <p>Email: <a href="mailto:hello@caonhatnguyen.com" className="text-slate-100 hover:text-sky-300">hello@caonhatnguyen.com</a></p>
-                <p>Instagram: <a href="https://instagram.com" className="text-slate-100 hover:text-sky-300">@caonhatnguyen</a></p>
-                <p>Behance: <a href="https://behance.net" className="text-slate-100 hover:text-sky-300">behance.net/caonhatnguyen</a></p>
-              </div>
-            </div>
-          </motion.div>
+            <h2 className="mb-8 text-4xl font-light text-white sm:text-5xl">
+              Let&apos;s create together.
+            </h2>
+            <p className="mb-10 text-lg leading-relaxed text-white/50">
+              Available for select collaborations, art direction, and identity
+              systems. Reach out to discuss new work or creative partnerships.
+            </p>
 
-          <motion.form initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.8 }} className="rounded-[32px] border border-white/10 bg-slate-950/90 p-8 shadow-luxe">
-            <div className="space-y-6">
+            <GlowCard className="p-8">
+              <h3 className="mb-6 text-lg font-medium text-white">
+                Get in Touch
+              </h3>
+              <div className="space-y-4 text-white/60">
+                <p>
+                  Email:{' '}
+                  <a
+                    href="mailto:hello@caonhatnguyen.com"
+                    className="text-white/80 transition hover:text-white"
+                  >
+                    hello@caonhatnguyen.com
+                  </a>
+                </p>
+                <p>
+                  Instagram:{' '}
+                  <a
+                    href="https://instagram.com"
+                    className="text-white/80 transition hover:text-white"
+                  >
+                    @caonhatnguyen
+                  </a>
+                </p>
+                <p>
+                  Behance:{' '}
+                  <a
+                    href="https://behance.net"
+                    className="text-white/80 transition hover:text-white"
+                  >
+                    behance.net/caonhatnguyen
+                  </a>
+                </p>
+                <p>
+                  LinkedIn:{' '}
+                  <a
+                    href="https://linkedin.com"
+                    className="text-white/80 transition hover:text-white"
+                  >
+                    linkedin.com/in/caonhatnguyen
+                  </a>
+                </p>
+              </div>
+            </GlowCard>
+          </div>
+
+          <GlowCard className="p-8">
+            <form className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm text-slate-300">Name</label>
-                <input id="name" type="text" placeholder="Your name" className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/90 px-5 py-4 text-slate-100 outline-none transition focus:border-sky-300/70" />
+                <label
+                  htmlFor="name"
+                  className="mb-2 block text-sm text-white/50"
+                >
+                  Name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Your name"
+                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-white/20"
+                />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm text-slate-300">Email</label>
-                <input id="email" type="email" placeholder="you@example.com" className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/90 px-5 py-4 text-slate-100 outline-none transition focus:border-sky-300/70" />
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm text-white/50"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-white/20"
+                />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm text-slate-300">Message</label>
-                <textarea id="message" rows={5} placeholder="Tell me about your project" className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/90 px-5 py-4 text-slate-100 outline-none transition focus:border-sky-300/70" />
+                <label
+                  htmlFor="message"
+                  className="mb-2 block text-sm text-white/50"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  rows={5}
+                  placeholder="Tell me about your project"
+                  className="w-full resize-none rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-white outline-none transition placeholder:text-white/30 focus:border-white/20"
+                />
               </div>
-              <button type="submit" className="inline-flex w-full items-center justify-center rounded-full bg-sky-400 px-6 py-4 text-sm font-semibold uppercase tracking-[0.3em] text-slate-950 transition duration-300 hover:bg-sky-300">
-                Send message
+              <button
+                type="submit"
+                className="w-full rounded-full bg-white px-6 py-3 text-sm font-medium tracking-[0.15em] text-slate-900 transition hover:bg-white/90"
+              >
+                Send Message
               </button>
-            </div>
-          </motion.form>
+            </form>
+          </GlowCard>
         </div>
-      </section>
+      </RevealSection>
 
-      <footer className="border-t border-white/10 bg-night/80 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© 2025 Cao Nhat Nguyen. Crafted with premium visual care.</p>
-          <p className="text-slate-400">Designed for cinematic, minimal, and luxury creative presentation.</p>
+      {/* Footer */}
+      <footer className="border-t border-white/[0.06] py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-white/40 md:flex-row">
+          <p>&copy; 2025 Cao Nhat Nguyen</p>
+          <p>Designed with care</p>
         </div>
       </footer>
-
-      <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
     </main>
   );
 }
