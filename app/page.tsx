@@ -217,10 +217,8 @@ function ProfileImage() {
         }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
       >
-        {/* Replace this placeholder with your image */}
-        {/* To add your image: replace the src below with your image path, e.g., "/profile.jpg" */}
         <Image
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&q=80&fit=crop&w=400&h=400"
+          src="/images/avatar.jpg"
           alt="Cao Nhat Nguyen"
           fill
           className="object-cover transition-transform duration-500"
