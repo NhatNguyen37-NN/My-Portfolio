@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Cá Nhân</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="logo">Portfolio</div>
+      <nav class="top-nav">
+        <button class="tab-button active" data-target="about">Giới Thiệu</button>
+        <button class="tab-button" data-target="projects">Dự Án</button>
+        <button class="tab-button" data-target="contact">Liên Hệ</button>
+      </nav>
+    </header>
+
+    <main class="page-container">
+      <section id="about" class="tab-panel active">
+        <div class="hero-card">
+          <div class="hero-avatar"></div>
+          <div class="hero-content">
+            <h1>Xin chào, tôi là [Tên của bạn]</h1>
+            <p>
+              Tôi là một người đam mê thiết kế và phát triển website, luôn mong muốn tạo ra
+              những sản phẩm trực quan, hiện đại và dễ sử dụng.
+            </p>
+
+            <div class="info-grid">
+              <div>
+                <h3>Email</h3>
+                <p>email@example.com</p>
+              </div>
+              <div>
+                <h3>Điện thoại</h3>
+                <p>+84 123 456 789</p>
+              </div>
+              <div>
+                <h3>Kỹ năng</h3>
+                <p>HTML, CSS, JavaScript, React, UI/UX</p>
+              </div>
+              <div>
+                <h3>Vị trí</h3>
+                <p>Frontend Developer</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects" class="tab-panel">
+        <h2>Dự án nổi bật</h2>
+        <div class="project-grid">
+          <article class="project-card">
+            <h3>Dự án 1</h3>
+            <p>Mô tả ngắn gọn về dự án, mục tiêu và kết quả đạt được.</p>
+            <div class="project-meta">
+              <span>Web app</span>
+              <span>React</span>
+            </div>
+          </article>
+          <article class="project-card">
+            <h3>Dự án 2</h3>
+            <p>Thiết kế giao diện, tương tác và trải nghiệm người dùng.</p>
+            <div class="project-meta">
+              <span>Thiết kế UI</span>
+              <span>Figma</span>
+            </div>
+          </article>
+          <article class="project-card">
+            <h3>Dự án 3</h3>
+            <p>Giải pháp tối ưu, hiệu suất,công nghệ và phản hồi khách hàng.</p>
+            <div class="project-meta">
+              <span>Fullstack</span>
+              <span>Node.js</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" class="tab-panel">
+        <h2>Liên hệ</h2>
+        <p>
+          Bạn có thể liên hệ với tôi khi cần hợp tác, tư vấn dự án hoặc nhận phản hồi.
+        </p>
+        <div class="contact-cards">
+          <div class="contact-card">
+            <h3>Email</h3>
+            <p>email@example.com</p>
+          </div>
+          <div class="contact-card">
+            <h3>Điện thoại</h3>
+            <p>+84 123 456 789</p>
+          </div>
+          <div class="contact-card">
+            <h3>Địa chỉ</h3>
+            <p>Hà Nội, Việt Nam</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
