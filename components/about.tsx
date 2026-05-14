@@ -51,8 +51,7 @@ export function About() {
               >
                 <p className="text-sm uppercase tracking-[0.28em] text-sky-300/80">Experience</p>
                 <p className="mt-3 leading-7 text-slate-300">
-                  Collaborating with premium studios, cultural agencies, and luxury brands to
-                  create polished visual stories and high-end digital experiences.
+                  With over 2 years of experience working with clients on creative visual projects. I specialize in poster design, banners, photobooks, and other visual design work, focusing on creating clean, modern, and impactful visuals that communicate ideas clearly and leave a strong impression.
                 </p>
               </motion.div>
               <motion.div
